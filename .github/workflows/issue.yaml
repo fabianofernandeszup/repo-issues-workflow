@@ -69,7 +69,7 @@ jobs:
         run: echo "Repository created at ${{ steps.create_repo.outputs.repo_url }}"
 
       - name: Stack Spot Workflow
-        uses: stack-spot/workflow-github-action
+        uses: stack-spot/workflow-github-action@main
         with:
           execution-id: "${{ github.event.inputs.execution-id }}"
           client-id: "${{ secrets.CLIENT_ID }}"
