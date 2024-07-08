@@ -1,0 +1,82 @@
+name: Issue Tagged Workflow
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  check-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if issue has required tags
+        id: check_tags
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const requiredTags = ['gitops', 'stackspot'];
+            const issueLabels = context.payload.issue.labels.map(label => label.name);
+            const hasRequiredTags = requiredTags.every(tag => issueLabels.includes(tag));
+            return hasRequiredTags;
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run workflow if tags are present
+        if: steps.check_tags.outputs.result == 'true'
+        run: echo "Issue has the required tags. Running workflow..."
+
+      - name: Parse issue
+        id: parse
+        uses: onmax/issue-form-parser@v1.5
+        with:
+          issue_number: ${{ github.event.issue.number }}
+
+      - name: Show parsed payload data
+        run: |
+          echo '${{ steps.parse.outputs.payload }}'
+
+      - name: Create a new repository app
+        id: create_repo
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const repoName = app_${{ fromJson(steps.parse.outputs.payload)["stk_project_name"] }};
+            const response = await github.repos.createForAuthenticatedUser({
+              name: repoName,
+              private: true
+            });
+            core.setOutput('repo_url', response.data.html_url);
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output App repository URL
+        run: echo "Repository created at ${{ steps.create_repo.outputs.repo_url }}"
+
+      - name: Create a new repository app infra
+        id: create_repo_infra
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const repoName = infra_${{ fromJson(steps.parse.outputs.payload)["stk_project_name"] }};
+            const response = await github.repos.createForAuthenticatedUser({
+              name: repoName,
+              private: true
+            });
+            core.setOutput('repo_url_infra', response.data.html_url);
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output App Infra repository URL
+        run: echo "Repository created at ${{ steps.create_repo.outputs.repo_url }}"
+
+      - name: Stack Spot Workflow
+        uses: stack-spot/workflow-github-action
+        with:
+          execution-id: "${{ github.event.inputs.execution-id }}"
+          client-id: "${{ secrets.CLIENT_ID }}"
+          client-secret: "${{ secrets.CLIENT_SECRET }}"
+          realm: "${{ vars.REALM }}"
+          debug: "${{ github.event.inputs.debug }}"
+          repository-url: "${{ steps.create_repo.outputs.repo_url }}"
+          origin-branch: develop
+          feature-branch: my-custom-feature-branch-${{ env.TIMESTAMP }}
+          extra-inputs: '{"repository-url-infra": "${{ steps.create_repo_infra.outputs.repo_url_infra }}"}'
