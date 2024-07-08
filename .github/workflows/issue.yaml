@@ -24,15 +24,17 @@ jobs:
         if: steps.check_tags.outputs.result == 'true'
         run: echo "Issue has the required tags. Running workflow..."
 
-      - name: Parse issue
-        id: parse
-        uses: onmax/issue-form-parser@v1.5
+      - name: Extract "stk_project_name" from issue body
+        id: extract_app_name
+        uses: actions/github-script@v6
         with:
-          issue_number: ${{ github.event.issue.number }}
-
-      - name: Show parsed payload data
-        run: |
-          echo '${{ steps.parse.outputs.payload }}'
+          script: |
+            const issueBody = context.payload.issue.body;
+            const appNameMatch = issueBody.match(/### >>stk_project_name<<\n\n(.*)\n/);
+            const appName = appNameMatch ? appNameMatch[1].trim() : '';
+            core.setOutput('stk_project_name', appName);
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create a new repository app
         id: create_repo
