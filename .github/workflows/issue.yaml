@@ -39,7 +39,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const repoName = app_${{ fromJson(steps.parse.outputs.payload)["stk_project_name"] }};
+            const repoName = 'app_${{ fromJson(steps.parse.outputs.payload)["stk_project_name"] }}';
             const response = await github.repos.createForAuthenticatedUser({
               name: repoName,
               private: true
@@ -56,7 +56,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const repoName = infra_${{ fromJson(steps.parse.outputs.payload)["stk_project_name"] }};
+            const repoName = 'infra_${{ fromJson(steps.parse.outputs.payload)["stk_project_name"] }}';
             const response = await github.repos.createForAuthenticatedUser({
               name: repoName,
               private: true
