@@ -36,6 +36,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - run: echo "stk_project_name: ${{ steps.extract_app_name.outputs.stk_project_name }}"
+
       - name: Create a new repository app
         id: create_repo
         uses: actions/github-script@v6
