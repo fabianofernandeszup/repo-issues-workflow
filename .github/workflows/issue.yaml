@@ -24,19 +24,20 @@ jobs:
         if: steps.check_tags.outputs.result == 'true'
         run: echo "Issue has the required tags. Running workflow..."
 
-
-      - name: Parse issue
+      - name: Run Issue form parser
         id: parse
-        uses: onmax/issue-form-parser@v1.5
+        uses: peter-murray/issue-forms-body-parser@v4.0.0
         with:
-          issue_number: ${{ github.event.issue.number }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_id: ${{ github.event.issue.number }}
+          separator: '###'
+          label_marker_start: '>>'
+          label_marker_end: '<<'
 
-      - name: Show parsed payload data
+      - name: Show parsed data JSON
+        env:
+          parsed_data: ${{ steps.parse.outputs.payload }}
         run: |
-          # Using the character `'` to prevent all characters enclosed within
-          # them from being treated as special characters (e.g. $ or `)
-          echo '${{ steps.parse.outputs.payload }}'
+          echo "$parsed_data"
 
 
       - name: Extract "stk_project_name" from issue body
