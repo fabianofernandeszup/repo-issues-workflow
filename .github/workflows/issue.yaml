@@ -24,31 +24,31 @@ jobs:
         if: steps.check_tags.outputs.result == 'true'
         run: echo "Issue has the required tags. Running workflow..."
 
-      - name: Run Issue form parser
+
+      - name: Parse issue
         id: parse
-        uses: peter-murray/issue-forms-body-parser@v4.0.0
+        uses: onmax/issue-form-parser@v1.5
         with:
-          issue_id: ${{ github.event.issue.number }}
-          separator: '###'
-          label_marker_start: '>>'
-          label_marker_end: '<<'
+          issue_number: ${{ github.event.issue.number }}
 
-      - name: Show parsed data JSON
-        env:
-          parsed_data: ${{ steps.parse.outputs.payload }}
+      - name: Show parsed payload data
         run: |
-          echo "$parsed_data"
-
+          # Using the character `'` to prevent all characters enclosed within
+          # them from being treated as special characters (e.g. $ or `)
+          echo '${{ steps.parse.outputs.payload }}'
 
       - name: Extract "stk_project_name" from issue body
         id: extract_app_name
         uses: actions/github-script@v6
         with:
           script: |
-            const issueBody = context.payload.issue.body;
-            const appNameMatch = issueBody.match(/### >>stk_project_name<<\n\n(.*)\n/);
-            const appName = appNameMatch ? appNameMatch[1].trim() : '';
-            core.setOutput('stk_project_name', appName);
+            const issueBody = '${{ fromJson(steps.parse.outputs.payload) }}''
+            for (const key in issueBody) {
+              if (obj.hasOwnProperty(key)) {
+                console.log(`${key}: ${obj[key]}`);
+                core.setOutput('${key}', ${obj[key]});
+              }
+            }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
