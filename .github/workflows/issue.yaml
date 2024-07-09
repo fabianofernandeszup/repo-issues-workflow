@@ -45,7 +45,7 @@ jobs:
             const issueBody = JSON.parse('${{ steps.parse.outputs.payload }}')
             for (const key in issueBody) {
               if (issueBody.hasOwnProperty(key)) {
-                let key_slug = key.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, ''); 
+                let key_slug = key.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '_').replace(/^-+|-+$/g, ''); 
                 console.log(`${key_slug}: ${issueBody[key]}`);
                 core.setOutput(key_slug, `${issueBody[key]}`);
               }
