@@ -44,9 +44,9 @@ jobs:
           script: |
             const issueBody = JSON.parse('${{ steps.parse.outputs.payload }}')
             for (const key in issueBody) {
-              if (obj.hasOwnProperty(key)) {
-                console.log(`${key}: ${obj[key]}`);
-                core.setOutput('${key}', ${obj[key]});
+              if (issueBody.hasOwnProperty(key)) {
+                console.log(`${key}: ${issueBody[key]}`);
+                core.setOutput(`${key}`, `${issueBody[key]}`);
               }
             }
         env:
