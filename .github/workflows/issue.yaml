@@ -42,7 +42,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const issueBody = '${{ fromJson(steps.parse.outputs.payload) }}''
+            const issueBody = ${{ fromJson(steps.parse.outputs.payload) }}
             for (const key in issueBody) {
               if (obj.hasOwnProperty(key)) {
                 console.log(`${key}: ${obj[key]}`);
