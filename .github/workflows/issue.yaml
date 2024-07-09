@@ -68,7 +68,7 @@ jobs:
             });
             core.setOutput('repo_url', response.data.html_url);
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHP_TOKEN }}
 
       - name: Output App repository URL
         run: echo "Repository created at ${{ steps.create_repo.outputs.repo_url }}"
@@ -85,7 +85,7 @@ jobs:
             });
             core.setOutput('repo_url_infra', response.data.html_url);
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHP_TOKEN }}
 
       - name: Output App Infra repository URL
         run: echo "Repository created at ${{ steps.create_repo.outputs.repo_url }}"
