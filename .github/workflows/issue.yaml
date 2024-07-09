@@ -56,6 +56,16 @@ jobs:
       - name: Output App Infra repository URL
         run: echo "Repository created at ${{ steps.extract_app_name.outputs.stk_project_name }}"
 
+      - name: Creating GitHub Organization Repository
+        uses: repo-ctrl/create-repo-action@main 
+        id: create-repo
+        with:
+          repo-name: 'app_${{ steps.extract_app_name.outputs.stk_project_name }}'
+          org-admin-token: '${{ secrets.GITHUB_TOKEN }}'
+
+      - name: Log URL to the repo
+        run: echo "The new repo is ${{ steps.create-repo.outputs.repo-url }}"
+
       - name: Create a new repository app
         id: create_repo
         uses: actions/github-script@v6
@@ -78,7 +88,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const repoName = 'infra_${{ steps.extract_app_name.outputs.stk_project_name }}'';
+            const repoName = 'infra_${{ steps.extract_app_name.outputs.stk_project_name }}';
             const response = await github.repos.createForAuthenticatedUser({
               name: repoName,
               private: true
